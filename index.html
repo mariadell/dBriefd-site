@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dBriefd — One daily briefing. Your world, digested.</title>
+  <meta name="description" content="Replace endless scrolling with one calm, personalized daily brief. Podcast-style audio. Read or listen in minutes." />
+  <meta property="og:title" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta property="og:description" content="One curated briefing per day. Podcast-style audio briefings. Stay informed without the overwhelm." />
+  <meta property="og:url" content="https://dbriefd.app" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --bg:       #0A0A0B;
+      --bg2:      #111113;
+      --bg3:      #18181b;
+      --white:    #EEEEE8;
+      --gold:     #E8C547;
+      --gold-dim: #b89a2f;
+      --muted:    #5a5a60;
+      --border:   rgba(238,238,232,.08);
+
+      --font-display: 'Syne', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+
+      --ease: cubic-bezier(.16,1,.3,1);
+    }
+
+    /* ── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-display);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── NOISE OVERLAY ──────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .025;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── UTILITIES ──────────────────────────────────────────────── */
+    .gold    { color: var(--gold); }
+    .muted   { color: var(--muted); }
+    .mono    { font-family: var(--font-mono); }
+    .center  { text-align: center; }
+
+    /* ── NAV ────────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,11,.85);
+      backdrop-filter: blur(20px);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .nav-logo span.d  { color: var(--white); }
+    .nav-logo span.br { color: var(--gold); }
+    .nav-logo span.d2 { color: var(--white); }
+    .nav-cta {
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .55rem 1.2rem;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all .2s var(--ease);
+    }
+    .pill-outline {
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: transparent;
+    }
+    .pill-outline:hover { border-color: var(--gold); color: var(--gold); }
+    .pill-gold {
+      background: var(--gold);
+      color: var(--bg);
+      border: 1px solid var(--gold);
+      font-weight: 500;
+    }
+    .pill-gold:hover { background: #f0d060; }
+
+    /* ── HERO ───────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 8rem 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* radial glow behind hero */
+    #hero::after {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,197,71,.13) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+
+    .hero-kicker {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp .6s var(--ease) .1s forwards;
+    }
+    .hero-headline {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      text-align: center;
+      max-width: 720px;
+      opacity: 0;
+      animation: fadeUp .7s var(--ease) .2s forwards;
+    }
+    .hero-headline em {
+      font-style: normal;
+      color: var(--gold);
+    }
+    .hero-sub {
+      margin-top: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: clamp(.875rem, 1.2vw, 1rem);
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+      text-align: center;
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp .7s var(--ease) .35s forwards;
+    }
+    .hero-actions {
+      margin-top: 2.75rem;
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp .7s var(--ease) .5s forwards;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--gold);
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: .95rem;
+      font-weight: 700;
+      padding: .9rem 2rem;
+      border-radius: 6px;
+      transition: all .2s var(--ease);
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: #f0d060; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(232,197,71,.2); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: transparent;
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: .95rem;
+      font-weight: 600;
+      padding: .9rem 2rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      transition: all .2s var(--ease);
+      cursor: pointer;
+    }
+    .btn-secondary:hover { border-color: rgba(238,238,232,.3); }
+
+    /* stores badge row */
+    .stores {
+      margin-top: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+      opacity: 0;
+      animation: fadeUp .7s var(--ease) .65s forwards;
+    }
+    .store-badge {
+      display: flex; align-items: center; gap: .5rem;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .06em;
+      color: var(--muted);
+      padding: .5rem .9rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: all .2s;
+    }
+    .store-badge:hover { color: var(--white); border-color: rgba(238,238,232,.2); }
+    .store-badge svg { width: 16px; height: 16px; }
+
+    /* scroll hint */
+    .scroll-hint {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .4rem;
+      font-family: var(--font-mono); font-size: .65rem; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+      animation: fadeIn 1s var(--ease) 1.5s both;
+    }
+    .scroll-hint-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ── STATS BAR ──────────────────────────────────────────────── */
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 0;
+    }
+    .stat-item {
+      flex: 1; min-width: 160px;
+      display: flex; flex-direction: column; align-items: center;
+      padding: .75rem 1.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -.03em;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-top: .25rem;
+    }
+
+    /* ── SECTIONS SHARED ────────────────────────────────────────── */
+    section { padding: 6rem 1.5rem; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      max-width: 640px;
+    }
+    .section-body {
+      font-family: var(--font-mono);
+      font-size: .95rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 520px;
+      margin-top: 1rem;
+    }
+
+    /* ── HOW IT WORKS ───────────────────────────────────────────── */
+    #how { background: var(--bg2); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      margin-top: 3.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .step {
+      background: var(--bg3);
+      padding: 2.25rem 2rem;
+      position: relative;
+      transition: background .2s;
+    }
+    .step:hover { background: #1e1e22; }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--gold);
+      letter-spacing: .1em;
+      margin-bottom: 1.25rem;
+    }
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: .6rem;
+    }
+    .step-desc {
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ── VERTICALS (NICHES) ─────────────────────────────────────── */
+    #verticals { background: var(--bg); }
+    .verticals-intro {
+      display: flex; flex-direction: column; gap: .75rem;
+      margin-bottom: 3.5rem;
+    }
+    .niche-tabs {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      margin-bottom: 2rem;
+    }
+    .niche-tab {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      letter-spacing: .08em;
+      padding: .5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s var(--ease);
+    }
+    .niche-tab:hover, .niche-tab.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+      font-weight: 500;
+    }
+    .niche-panels { position: relative; min-height: 320px; }
+    .niche-panel {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .niche-panel.active { display: grid; }
+    .niche-tag {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .75rem;
+    }
+    .niche-headline {
+      font-size: clamp(1.4rem, 3vw, 2.25rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      margin-bottom: 1rem;
+    }
+    .niche-body {
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .niche-pills {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+    }
+    .niche-pill {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      padding: .3rem .75rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    /* sample brief card */
+    .brief-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+    }
+    .brief-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .brief-card-label {
+      font-size: .65rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .brief-card-time {
+      font-size: .65rem;
+      color: var(--muted);
+    }
+    .brief-item {
+      display: flex; gap: .75rem;
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .brief-item:last-child { border-bottom: none; }
+    .brief-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .brief-text {
+      font-size: .78rem;
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--white);
+    }
+    .brief-text span { color: var(--muted); }
+
+    /* ── FEATURES ───────────────────────────────────────────────── */
+    #features { background: var(--bg2); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin-top: 3.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .feat {
+      background: var(--bg3);
+      padding: 2rem;
+      transition: background .2s;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .feat:nth-child(3n) { border-right: none; }
+    .feat:nth-last-child(-n+3) { border-bottom: none; }
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feat:nth-child(3n) { border-right: 1px solid var(--border); }
+      .feat:nth-child(2n) { border-right: none; }
+      .feat:nth-last-child(-n+3) { border-bottom: 1px solid var(--border); }
+      .feat:nth-last-child(-n+2) { border-bottom: none; }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .feat { border-right: none; }
+      .feat:not(:last-child) { border-bottom: 1px solid var(--border); }
+      .feat:last-child { border-bottom: none; }
+    }
+    .feat:hover { background: #1f1f23; }
+    .feat-icon {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+    .feat-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .feat-desc {
+      font-family: var(--font-mono);
+      font-size: .8rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ── CONVERSION BOOST ───────────────────────────────────────── */
+    #boost { background: var(--bg); }
+    .boost-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+    .boost-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+      padding: 1.5rem 2rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg2);
+      min-width: 200px;
+    }
+    .boost-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .boost-text {
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--white);
+      text-align: center;
+      margin: 0;
+    }
+
+    /* ── PRICING ────────────────────────────────────────────────── */
+    #pricing { background: var(--bg); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+    .plan {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      background: var(--bg2);
+      position: relative;
+      transition: border-color .2s, transform .2s;
+    }
+    .plan:hover { border-color: rgba(238,238,232,.15); transform: translateY(-4px); }
+    .plan.featured {
+      border-color: var(--gold);
+      background: var(--bg3);
+    }
+    .plan-badge {
+      position: absolute; top: -1px; right: 1.5rem;
+      background: var(--gold);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      padding: .25rem .75rem;
+      border-radius: 0 0 6px 6px;
+    }
+    .plan-name {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .75rem;
+    }
+    .plan-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--white);
+    }
+    .plan-price sub {
+      font-size: .9rem;
+      font-weight: 400;
+      color: var(--muted);
+      vertical-align: baseline;
+    }
+    .plan-price .mo {
+      font-size: .85rem;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+    .plan-save {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--gold);
+      margin: .4rem 0 .5rem;
+      letter-spacing: .04em;
+    }
+    .plan-desc {
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin: .75rem 0 1.5rem;
+      line-height: 1.6;
+    }
+    .plan-features {
+      list-style: none;
+      display: flex; flex-direction: column; gap: .6rem;
+      margin-bottom: 2rem;
+    }
+    .plan-features li {
+      font-family: var(--font-mono);
+      font-size: .8rem;
+      font-weight: 300;
+      color: var(--white);
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .plan-features li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: .55rem;
+      flex-shrink: 0;
+    }
+    .plan-features li.dim { color: var(--muted); }
+    .plan-features li.dim::before { color: var(--muted); }
+    .plan-cta {
+      display: block; width: 100%;
+      padding: .85rem;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: .88rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s var(--ease);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--white);
+    }
+    .plan-cta:hover { border-color: rgba(238,238,232,.3); }
+    .plan.featured .plan-cta {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+    .plan.featured .plan-cta:hover { background: #f0d060; }
+
+    /* ── CTA BANNER ─────────────────────────────────────────────── */
+    #cta {
+      background: var(--bg);
+      padding: 7rem 1.5rem;
+      text-align: center;
+    }
+    .cta-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .cta-eyebrow {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+    .cta-headline {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      margin-bottom: 1.5rem;
+    }
+    .cta-sub {
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+    .cta-form { width: 100%; max-width: 100%; }
+    .cta-form .email-row { margin-bottom: 0; }
+    .email-row {
+      display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center;
+    }
+    .email-input {
+      flex: 1; min-width: 220px; max-width: 320px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .85rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--white);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .email-input::placeholder { color: var(--muted); }
+    .email-input:focus { border-color: var(--gold); }
+    .email-submit {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: .85rem 1.75rem;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s var(--ease);
+    }
+    .email-submit:hover { background: #f0d060; transform: translateY(-2px); }
+    .email-note {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--muted);
+      margin-top: .9rem;
+      letter-spacing: .04em;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .footer-links {
+      display: flex; flex-wrap: wrap; gap: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--muted);
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--muted);
+      width: 100%;
+      margin-top: .5rem;
+    }
+
+    /* ── ANIMATIONS ─────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: .4; transform: scaleY(1); }
+      50%       { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* reveal on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .65s var(--ease), transform .65s var(--ease);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-logo { font-size: 1.15rem; }
+      .pill { font-size: .65rem; padding: .45rem .9rem; }
+      .niche-panel.active { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+      section { padding: 4rem 1.25rem; }
+      .brief-card { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-secondary { justify-content: center; }
+      .email-row { flex-direction: column; }
+      .email-input { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <span class="d">d</span><span class="br">Brief</span><span class="d2">d</span>
+    </div>
+    <div class="nav-cta">
+      <a href="#pricing" class="pill pill-outline">Pricing</a>
+      <a href="#cta" class="pill pill-gold">Get Early Access</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <p class="hero-kicker">Simple. Calm. Personalized.</p>
+    <h1 class="hero-headline">
+      Replace endless scrolling with<br />one <em>calm</em> daily brief.
+    </h1>
+    <p class="hero-sub">
+      All the news you need — in one daily brief. No noise. No scrolling. Choose your topics. Short, clear summaries. Read in minutes — or listen like a podcast.
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+        Start your free brief
+      </a>
+      <a href="#verticals" class="btn-secondary">
+        See how it works ↓
+      </a>
+    </div>
+    <div class="stores">
+      <a href="#cta" class="store-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        App Store
+      </a>
+      <a href="#cta" class="store-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.16.65.17.97 0l11.5-6.56-2.84-2.87-9.63 9.43zm14.52-9.08L5.26.5C4.95.31 4.58.3 4.25.46L14.02 11.7l3.68-1.02zM21.54 10.2l-2.8-1.6-3.27.91 3.27 3.3 2.8-1.62c.8-.45.8-1.54 0-1.99zM4.25 23.54c.33.16.7.15 1.01-.04L17.8 16.8 14.02 12.3 4.25 23.54z"/></svg>
+        Google Play
+      </a>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-hint-line"></div>
+      scroll
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar reveal">
+    <div class="stat-item">
+      <div class="stat-num">&lt;5 min</div>
+      <div class="stat-label">Daily read time</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">$0</div>
+      <div class="stat-label">Ads. Ever.</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Brief per day</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Scroll removed</div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="section-inner">
+      <p class="section-tag reveal">What is Briefd</p>
+      <h2 class="section-title reveal">One daily briefing.<br/>Tailored to you.</h2>
+      <p class="section-body reveal">News today is noisy, endless, and overwhelming. You jump between apps, scroll too much, and still miss what matters. Briefd replaces all of that with one daily briefing — short, clear summaries, only the topics you care about, delivered once per day. Stay informed without stress.</p>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">01 / CONFIGURE</div>
+          <div class="step-title">Pick your world</div>
+          <p class="step-desc">Choose your topics and delivery time. Gaming, finance, books, health — mix however you want. Your brief is yours alone.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">02 / RECEIVE</div>
+          <div class="step-title">Your brief arrives</div>
+          <p class="step-desc">We gather, filter, and summarize content into one daily update. Clean summaries. No clickbait. No algorithm games. Just signal.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">03 / CONSUME</div>
+          <div class="step-title">Read or listen</div>
+          <p class="step-desc">Turn your briefing into a podcast-style audio digest. Commute, gym, coffee — consume your world on your terms, eyes free.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">04 / DIG IN</div>
+          <div class="step-title">Go deeper when you want</div>
+          <p class="step-desc">Every summary links back to the full article. Curious? One tap opens it in-app — no rabbit holes, no tab explosions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERTICALS / NICHES -->
+  <section id="verticals">
+    <div class="section-inner">
+      <p class="section-tag">Who it's for</p>
+      <div class="verticals-intro">
+        <h2 class="section-title reveal">Built for people who<br/>want clarity.</h2>
+        <p class="section-body reveal">Or anyone who wants to stay informed — without overload.</p>
+      </div>
+
+      <div class="niche-tabs reveal">
+        <button class="niche-tab active" onclick="showNiche('dev')">👨‍💻 Developers</button>
+        <button class="niche-tab" onclick="showNiche('finance')">💰 Investors</button>
+        <button class="niche-tab" onclick="showNiche('traveler')">✈️ Travelers</button>
+        <button class="niche-tab" onclick="showNiche('sports')">⚽ Sports</button>
+        <button class="niche-tab" onclick="showNiche('reader')">📚 Book lovers</button>
+        <button class="niche-tab" onclick="showNiche('gamer')">🎮 Gamers</button>
+        <button class="niche-tab" onclick="showNiche('wellness')">🧠 Wellness</button>
+        <button class="niche-tab" onclick="showNiche('climate')">🌍 Climate</button>
+        <button class="niche-tab" onclick="showNiche('entrepreneur')">🚀 Entrepreneurs</button>
+        <button class="niche-tab" onclick="showNiche('nomad')">🏡 Remote workers</button>
+      </div>
+
+      <div class="niche-panels">
+
+        <!-- DEV -->
+        <div class="niche-panel active" id="niche-dev">
+          <div class="niche-content">
+            <p class="niche-tag">For developers</p>
+            <h3 class="niche-headline">Stop doomscrolling<br/>at 11pm.</h3>
+            <p class="niche-body">You built for focus. Your news habit shouldn't undo that. Get your daily dev brief — framework releases, industry moves, AI research, job market — and close the app.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">AI & machine learning</span>
+              <span class="niche-pill">Cloud & security</span>
+              <span class="niche-pill">Dev tools</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Dev Brief · Today 7:00am</span>
+              <span class="brief-card-time">3 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major framework hits LTS — key changes you should know about. <span>Update recommended.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">AI model pricing drops 40% across providers. <span>Affects billing from today.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Critical zero-day in popular dev tool patched. <span>Update if you're on older versions.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Cloud provider drops edge function cold-start times to <span>&lt;50ms</span> globally. Benchmarks inside.</div></div>
+          </div>
+        </div>
+
+        <!-- FINANCE -->
+        <div class="niche-panel" id="niche-finance">
+          <div class="niche-content">
+            <p class="niche-tag">For investors</p>
+            <h3 class="niche-headline">Market signal,<br/>not market noise.</h3>
+            <p class="niche-body">Markets are noisy. Get a clean morning brief — what moved, what's worth watching, what you can actually act on.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Markets</span>
+              <span class="niche-pill">Startups & fintech</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Finance Brief · Today 6:00am</span>
+              <span class="brief-card-time">5 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Central bank holds rates steady. Chair signals <span>2 cuts projected for H2</span> — markets up 0.4% on open.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Tech giant beats Q1 earnings by 18%. <span>Data center revenue +209% YoY.</span> Stock +6% pre-market.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major AI company files for secondary raise. <span>Term sheets being circulated this week.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Top VC publishes annual AI report. <span>Key finding: enterprise retention rates dropping</span> in year-2 cohorts.</div></div>
+          </div>
+        </div>
+
+        <!-- TRAVELER -->
+        <div class="niche-panel" id="niche-traveler">
+          <div class="niche-content">
+            <p class="niche-tag">For travelers</p>
+            <h3 class="niche-headline">Destinations, trends, tips.</h3>
+            <p class="niche-body">Stay on top of travel news — new routes, visa updates, destination highlights, and practical tips for your next trip.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Destinations</span>
+              <span class="niche-pill">Travel trends</span>
+              <span class="niche-pill">Tips & guides</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Travel Brief · Today 7:00am</span>
+              <span class="brief-card-time">3 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New direct routes announced for summer. <span>Major hubs expanding.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Visa policy updates for popular destinations. <span>Easier entry for several countries.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Under-the-radar destination gaining traction. <span>Best time to visit: now.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Travel hack of the week: <span>save on peak-season flights.</span></div></div>
+          </div>
+        </div>
+
+        <!-- SPORTS -->
+        <div class="niche-panel" id="niche-sports">
+          <div class="niche-content">
+            <p class="niche-tag">For sports fans</p>
+            <h3 class="niche-headline">Scores, transfers, headlines.</h3>
+            <p class="niche-body">Your daily sports digest — results, trades, major stories. No fluff. Just what happened and what matters.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Scores</span>
+              <span class="niche-pill">Transfers</span>
+              <span class="niche-pill">Major stories</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Sports Brief · Today 7:00am</span>
+              <span class="brief-card-time">4 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Championship finals set. <span>Key matchups this weekend.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major transfer confirmed. <span>Record fee for star player.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Injury update: key player returns. <span>Lineup impact.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">League standings update. <span>Title race tightens.</span></div></div>
+          </div>
+        </div>
+
+        <!-- READER -->
+        <div class="niche-panel" id="niche-reader">
+          <div class="niche-content">
+            <p class="niche-tag">For book lovers</p>
+            <h3 class="niche-headline">New releases, reviews.</h3>
+            <p class="niche-body">New releases, award news, author interviews, publishing buzz — without the noise. A 5-minute read about what's worth reading.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">New releases</span>
+              <span class="niche-pill">Reviews</span>
+              <span class="niche-pill">Award season</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Literary Brief · Today 7:30am</span>
+              <span class="brief-card-time">3 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major literary prize longlist announced. <span>11 titles, 3 debut novels.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Acclaimed author's new essay collection drops this month. <span>Pre-orders open now.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Publishing industry reports rise in literary fiction sales. <span>Physical books outpace ebooks.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">This week's rec: <span>a buzzy debut novel</span> — strong ratings, growing word of mouth.</div></div>
+          </div>
+        </div>
+
+        <!-- GAMER -->
+        <div class="niche-panel" id="niche-gamer">
+          <div class="niche-content">
+            <p class="niche-tag">For gamers</p>
+            <h3 class="niche-headline">Releases, industry news.</h3>
+            <p class="niche-body">Patch notes, studio announcements, esports results, hardware drops — before you load into your first match. No clickbait. Just the brief.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Releases</span>
+              <span class="niche-pill">Industry news</span>
+              <span class="niche-pill">Esports</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Gaming Brief · Today 8:00am</span>
+              <span class="brief-card-time">4 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Patch live — ranked matchmaking rebalanced. <span>3 heroes adjusted.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major esports finals set for this weekend. <span>Grand Final Sunday.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New GPU benchmarks leaked. <span>15% faster at lower price.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Subscription service adds 4 titles. <span>Major DLC included.</span></div></div>
+          </div>
+        </div>
+
+        <!-- WELLNESS -->
+        <div class="niche-panel" id="niche-wellness">
+          <div class="niche-content">
+            <p class="niche-tag">For wellness & mental health</p>
+            <h3 class="niche-headline">Psychology, habits, wellbeing.</h3>
+            <p class="niche-body">Mental health, psychology, and wellbeing — filtered for real research. No hype. Stay informed on what actually helps.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Psychology</span>
+              <span class="niche-pill">Habits</span>
+              <span class="niche-pill">Wellbeing</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Health Brief · Today 6:30am</span>
+              <span class="brief-card-time">3 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New study: <span>Zone 2 cardio 3×/week</span> reduces all-cause mortality by 26% vs sedentary baseline.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Creatine monohydrate confirmed effective for <span>cognitive performance</span> under sleep deprivation — meta-analysis of 14 trials.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">FDA clears new CGM (continuous glucose monitor) for <span>non-diabetic consumers</span> — no prescription needed.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Stretching timing study: <span>post-workout is 2× more effective</span> than pre-workout for long-term flexibility gains.</div></div>
+          </div>
+        </div>
+
+        <!-- CLIMATE -->
+        <div class="niche-panel" id="niche-climate">
+          <div class="niche-content">
+            <p class="niche-tag">For climate & sustainability</p>
+            <h3 class="niche-headline">Energy, policy, renewables.</h3>
+            <p class="niche-body">Climate news, energy transitions, renewables, and policy — without the noise. Stay informed on what's shaping our future.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Climate</span>
+              <span class="niche-pill">Renewables</span>
+              <span class="niche-pill">Policy</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Climate Brief · Today 7:00am</span>
+              <span class="brief-card-time">4 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major renewable milestone reached. <span>Grid capacity up 20%.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New climate policy announced. <span>Key deadlines for industry.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Breakthrough in battery tech. <span>Storage costs drop.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Sustainability report: industry progress. <span>What's working.</span></div></div>
+          </div>
+        </div>
+
+        <!-- ENTREPRENEUR -->
+        <div class="niche-panel" id="niche-entrepreneur">
+          <div class="niche-content">
+            <p class="niche-tag">For entrepreneurs</p>
+            <h3 class="niche-headline">Startups, product, growth.</h3>
+            <p class="niche-body">Startup funding, ecosystem news, product insights, and growth strategies — your daily briefing for building.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Startup funding</span>
+              <span class="niche-pill">Product & design</span>
+              <span class="niche-pill">Growth</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Startup Brief · Today 7:00am</span>
+              <span class="brief-card-time">4 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major funding round announced. <span>Series B for hot startup.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Product launch of the week. <span>Early traction numbers.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Growth strategy from top founder. <span>Key takeaways.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Ecosystem update: new accelerator batch. <span>Companies to watch.</span></div></div>
+          </div>
+        </div>
+
+        <!-- REMOTE WORKERS -->
+        <div class="niche-panel" id="niche-nomad">
+          <div class="niche-content">
+            <p class="niche-tag">For remote workers</p>
+            <h3 class="niche-headline">Productivity, distributed teams.</h3>
+            <p class="niche-body">Remote work, productivity, and distributed teams — stay informed on what's shaping how we work.</p>
+            <div class="niche-pills">
+              <span class="niche-pill">Productivity</span>
+              <span class="niche-pill">Distributed teams</span>
+              <span class="niche-pill">Remote work policy</span>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div class="brief-card-header">
+              <span class="brief-card-label">Remote Brief · Today 7:00am</span>
+              <span class="brief-card-time">4 min read</span>
+            </div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New productivity study: async best practices. <span>What top teams do.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Remote work policy updates. <span>Key changes for distributed teams.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Tool of the week: collaboration platform. <span>Early reviews.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Co-working trends: cities attracting remote workers. <span>Cost comparison.</span></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-inner">
+      <p class="section-tag reveal">Why dBriefd</p>
+      <h2 class="section-title reveal">Designed against<br/>the attention economy.</h2>
+      <div class="features-grid">
+        <div class="feat reveal">
+          <div class="feat-icon">🎙️</div>
+          <div class="feat-title">Podcast-style audio briefings</div>
+          <p class="feat-desc">Every briefing becomes a natural-sounding audio digest (10–30 min). Commute, gym, or morning coffee — your brief plays like a show, not a robot reading headlines.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="feat-icon">🔇</div>
+          <div class="feat-title">Zero infinite scroll</div>
+          <p class="feat-desc">There is no feed. No recommendation engine. No "you might also like." You read your brief and you're done. That's the whole product.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="feat-icon">🚫</div>
+          <div class="feat-title">No ads. Ever.</div>
+          <p class="feat-desc">We don't sell your attention. We don't sell your data. The business model is you paying $3.99/mo — and that's it. Aligned incentives.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="feat-icon">⚡</div>
+          <div class="feat-title">Clear, factual summaries</div>
+          <p class="feat-desc">Short snippets that give you the context to understand why something matters — then stop. Not a link aggregator. Not a headline digest.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="feat-icon">🎯</div>
+          <div class="feat-title">Hyper-personalized</div>
+          <p class="feat-desc">Your topics, your sources, your cadence. Morning, evening, or midday. 3 topics or 10. Your brief, configured once, delivered perfectly every time.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="feat-icon">🔗</div>
+          <div class="feat-title">One tap to the source</div>
+          <p class="feat-desc">Every summary links to the original article, opened in a clean in-app reader. No browser switching. No tracking parameters. Just the story.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONVERSION BOOST -->
+  <section id="boost">
+    <div class="section-inner">
+      <p class="section-tag reveal">Save time. Stay focused.</p>
+      <h2 class="section-title reveal">With Briefd you can:</h2>
+      <div class="boost-grid reveal">
+        <div class="boost-item">
+          <span class="boost-icon">⏱</span>
+          <p class="boost-text">Replace 1–2 hours of scrolling</p>
+        </div>
+        <div class="boost-item">
+          <span class="boost-icon">✓</span>
+          <p class="boost-text">Stay updated in minutes</p>
+        </div>
+        <div class="boost-item">
+          <span class="boost-icon">🎧</span>
+          <p class="boost-text">Listen instead of reading</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-inner">
+      <p class="section-tag reveal">Simple pricing</p>
+      <h2 class="section-title reveal">No dark patterns.<br/>No hidden tiers.</h2>
+      <p class="section-body reveal">Pay for what you actually use. Cancel anytime, from inside the app, in two taps.</p>
+      <div class="pricing-grid">
+
+        <div class="plan reveal">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0 <span class="mo">/ forever</span></div>
+          <p class="plan-desc">Your daily taste of calm news. Perfect for trying Briefd.</p>
+          <ul class="plan-features">
+            <li>5 stories per day</li>
+            <li>Choose up to 2 topics</li>
+            <li>3-day history</li>
+            <li>Short summaries</li>
+            <li class="dim">Daily audio brief (10–30 min)</li>
+            <li class="dim">Add your own sources</li>
+            <li class="dim">Hide topics you don't want</li>
+          </ul>
+          <a href="#cta" class="plan-cta">Start free</a>
+        </div>
+
+        <div class="plan reveal">
+          <div class="plan-name">Pro · Monthly</div>
+          <div class="plan-price" data-price-usd="$3.99" data-price-eur="€3.99"><span class="price-amount">$3.99</span> <span class="mo">/ month</span></div>
+          <p class="plan-desc">Your complete daily brief. Everything you need to stay informed — without noise.</p>
+          <ul class="plan-features">
+            <li>Up to 30 stories per day</li>
+            <li>Unlimited topics</li>
+            <li>Full summaries</li>
+            <li>Daily audio brief (10–30 min)</li>
+            <li>Smart personalization</li>
+            <li>Add your own sources</li>
+            <li>Hide topics you don't want</li>
+            <li>Extended history</li>
+          </ul>
+          <a href="#cta" class="plan-cta">Start 7-day free trial</a>
+        </div>
+
+        <div class="plan featured reveal">
+          <div class="plan-badge">Best value</div>
+          <div class="plan-name">Pro · Yearly</div>
+          <div class="plan-price" data-price-usd="$39.99" data-price-eur="€39.99"><span class="price-amount">$39.99</span> <span class="mo">/ year</span></div>
+          <p class="plan-save" data-save-usd="Save 17% · $3.33/mo" data-save-eur="Save 17% · €3.33/mo">Save 17% · $3.33/mo</p>
+          <p class="plan-desc">Same as Pro. Pay once, stay informed all year.</p>
+          <ul class="plan-features">
+            <li>Up to 30 stories per day</li>
+            <li>Unlimited topics</li>
+            <li>Full summaries</li>
+            <li>Daily audio brief (10–30 min)</li>
+            <li>Smart personalization</li>
+            <li>Add your own sources</li>
+            <li>Hide topics you don't want</li>
+            <li>Extended history</li>
+          </ul>
+          <a href="#cta" class="plan-cta">Start 7-day free trial</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="cta-inner">
+      <p class="cta-eyebrow">Early Access Open</p>
+      <h2 class="cta-headline">Your morning deserves better.</h2>
+      <p class="cta-sub">One briefing. Your topics. Delivered daily. Join the early access list — no spam, just a single email when doors open.</p>
+      <!-- Replace YOUR_FORMSPREE_ID with your Formspree form ID from formspree.io -->
+      <form id="early-access-form" class="cta-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+        <div class="email-row">
+          <input class="email-input" type="email" name="email" placeholder="your@email.com" required />
+          <button type="submit" class="email-submit">Claim your spot →</button>
+        </div>
+      </form>
+      <p class="email-note">Free tier available at launch · No credit card required · Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <span style="color:var(--white)">d</span><span style="color:var(--gold)">Brief</span><span style="color:var(--white)">d</span>
+    </div>
+    <div class="footer-links">
+      <a href="#how">How it works</a>
+      <a href="#verticals">Verticals</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:contact@dbriefd.app">contact@dbriefd.app</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+    <div class="footer-copy">© <span id="current-year"></span> dBriefd. All rights reserved. Built for the overstimulated.</div>
+  </footer>
+
+  <script>
+    /* Dynamic year */
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    /* Region-based pricing (EUR for EU, USD default). Fails silently to USD. */
+    (function() {
+      var EU_CODES = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE'];
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 4000);
+      var geoUrl = 'https://ipwho.is/';
+      var corsProxy = 'https://api.allorigins.win/raw?url=';
+      fetch(corsProxy + encodeURIComponent(geoUrl), { signal: controller.signal })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          clearTimeout(timeout);
+          if (!data) return;
+          var cc = data.country_code || (data.country && data.country.code);
+          var isEU = data.is_eu === true || (cc && EU_CODES.indexOf(cc) !== -1);
+          if (!isEU) return;
+          document.querySelectorAll('[data-price-eur]').forEach(function(el) {
+            var amt = el.getAttribute('data-price-eur');
+            var node = el.querySelector('.price-amount');
+            if (amt && node) node.textContent = amt;
+          });
+          document.querySelectorAll('[data-save-eur]').forEach(function(el) {
+            var txt = el.getAttribute('data-save-eur');
+            if (txt) el.textContent = txt;
+          });
+        })
+        .catch(function() { clearTimeout(timeout); });
+    })();
+
+    /* Niche tab switcher */
+    function showNiche(id) {
+      document.querySelectorAll('.niche-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.niche-panel').forEach(p => p.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('niche-' + id).classList.add('active');
+    }
+
+    /* Scroll reveal */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 60);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => observer.observe(el));
+
+    /* Formspree form submission */
+    document.getElementById('early-access-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = this;
+      const input = form.querySelector('.email-input');
+      const btn = form.querySelector('.email-submit');
+      if (!input.value || !input.value.includes('@')) {
+        input.style.borderColor = 'var(--gold)';
+        input.focus();
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          btn.textContent = '✦ You\'re on the list';
+          btn.style.background = '#2a7a2a';
+          btn.style.color = '#fff';
+          input.disabled = true;
+          input.style.opacity = '.4';
+        } else {
+          btn.textContent = 'Claim your spot →';
+          btn.disabled = false;
+          alert('Something went wrong. Please try again.');
+        }
+      } catch (err) {
+        btn.textContent = 'Claim your spot →';
+        btn.disabled = false;
+        alert('Something went wrong. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
