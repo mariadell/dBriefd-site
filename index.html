@@ -4,10 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dBriefd — One daily briefing. Your world, digested.</title>
-  <meta name="description" content="Replace endless scrolling with one calm, personalized daily brief. Podcast-style audio. Read or listen in minutes." />
+  <meta name="description" content="Replace endless scrolling with one calm, personalized daily news brief. Choose topics. Get short summaries. Read or listen as podcast. Free tier available." />
   <meta property="og:title" content="dBriefd — One daily briefing. Your world, digested." />
   <meta property="og:description" content="One curated briefing per day. Podcast-style audio briefings. Stay informed without the overwhelm." />
   <meta property="og:url" content="https://dbriefd.app" />
+  <link rel="canonical" href="https://dbriefd.app/" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="dBriefd" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta name="twitter:description" content="Replace endless scrolling with one calm, personalized daily brief. Podcast-style audio. Read or listen in minutes." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
@@ -790,6 +798,35 @@
       .email-input { max-width: 100%; }
     }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "dBriefd",
+    "url": "https://dbriefd.app",
+    "description": "One daily briefing. Your world, digested. Replace endless scrolling with a calm, personalized news digest. Podcast-style audio. Read or listen in minutes.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "contact@dbriefd.app",
+      "contactType": "customer service"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "dBriefd",
+    "applicationCategory": "NewsApplication",
+    "operatingSystem": "iOS, Android",
+    "description": "Personalized daily news briefing. Choose topics, get one daily digest. Read or listen as podcast. No ads. No infinite scroll.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -804,6 +841,7 @@
     </div>
   </nav>
 
+  <main>
   <!-- HERO -->
   <section id="hero">
     <p class="hero-kicker">Simple. Calm. Personalized.</p>
@@ -1175,7 +1213,7 @@
         <div class="feat reveal">
           <div class="feat-icon">🚫</div>
           <div class="feat-title">No ads. Ever.</div>
-          <p class="feat-desc">We don't sell your attention. We don't sell your data. The business model is you paying $3.99/mo — and that's it. Aligned incentives.</p>
+          <p class="feat-desc">We don't sell your attention. We don't sell your data. The business model is simple: you pay a small monthly fee — no ads, no data selling. Aligned incentives.</p>
         </div>
         <div class="feat reveal">
           <div class="feat-icon">⚡</div>
@@ -1221,9 +1259,9 @@
   <!-- PRICING -->
   <section id="pricing">
     <div class="section-inner">
-      <p class="section-tag reveal">Simple pricing</p>
-      <h2 class="section-title reveal">No dark patterns.<br/>No hidden tiers.</h2>
-      <p class="section-body reveal">Pay for what you actually use. Cancel anytime, from inside the app, in two taps.</p>
+      <p class="section-tag reveal">Plans at a glance</p>
+      <h2 class="section-title reveal">What's coming.<br/>Pricing announced at launch.</h2>
+      <p class="section-body reveal">We're in early access. Join the beta to try it — no commitment. Final pricing when we launch.</p>
       <div class="pricing-grid">
 
         <div class="plan reveal">
@@ -1239,12 +1277,12 @@
             <li class="dim">Add your own sources</li>
             <li class="dim">Hide topics you don't want</li>
           </ul>
-          <a href="#cta" class="plan-cta">Start free</a>
+          <a href="#cta" class="plan-cta">Join beta</a>
         </div>
 
         <div class="plan reveal">
           <div class="plan-name">Pro · Monthly</div>
-          <div class="plan-price" data-price-usd="$3.99" data-price-eur="€3.99"><span class="price-amount">$3.99</span> <span class="mo">/ month</span></div>
+          <div class="plan-price"><span class="price-amount">Coming soon</span></div>
           <p class="plan-desc">Your complete daily brief. Everything you need to stay informed — without noise.</p>
           <ul class="plan-features">
             <li>Up to 30 stories per day</li>
@@ -1256,14 +1294,13 @@
             <li>Hide topics you don't want</li>
             <li>Extended history</li>
           </ul>
-          <a href="#cta" class="plan-cta">Start 7-day free trial</a>
+          <a href="#cta" class="plan-cta">Join beta</a>
         </div>
 
         <div class="plan featured reveal">
           <div class="plan-badge">Best value</div>
           <div class="plan-name">Pro · Yearly</div>
-          <div class="plan-price" data-price-usd="$39.99" data-price-eur="€39.99"><span class="price-amount">$39.99</span> <span class="mo">/ year</span></div>
-          <p class="plan-save" data-save-usd="Save 17% · $3.33/mo" data-save-eur="Save 17% · €3.33/mo">Save 17% · $3.33/mo</p>
+          <div class="plan-price"><span class="price-amount">Coming soon</span></div>
           <p class="plan-desc">Same as Pro. Pay once, stay informed all year.</p>
           <ul class="plan-features">
             <li>Up to 30 stories per day</li>
@@ -1275,7 +1312,7 @@
             <li>Hide topics you don't want</li>
             <li>Extended history</li>
           </ul>
-          <a href="#cta" class="plan-cta">Start 7-day free trial</a>
+          <a href="#cta" class="plan-cta">Join beta</a>
         </div>
 
       </div>
@@ -1297,6 +1334,7 @@
       <p class="email-note">Free tier available at launch · No credit card required · Cancel anytime</p>
     </div>
   </section>
+  </main>
 
   <!-- FOOTER -->
   <footer>
