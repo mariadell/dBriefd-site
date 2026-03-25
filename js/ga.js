@@ -3,7 +3,6 @@
  */
 (function () {
   var id = 'G-4JY5TQ48PX';
-  if (!id || id === 'G-4JY5TQ48PX') return;
 
   var s = document.createElement('script');
   s.async = true;
