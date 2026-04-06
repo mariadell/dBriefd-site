@@ -35,7 +35,7 @@
       --white:    #EEEEE8;
       --gold:     #E6B332;
       --gold-dim: #b89a2f;
-      --muted:    #5a5a60;
+      --muted:    #8e8e98;
       --border:   rgba(238,238,232,.08);
 
       --font-display: 'Syne', sans-serif;
@@ -267,7 +267,6 @@
       letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--muted);
-      opacity: .75;
     }
 
     /* scroll hint */
@@ -425,14 +424,14 @@
       font-weight: 300;
       color: var(--muted);
       line-height: 1.45;
-      opacity: 0.85;
+      opacity: 1;
     }
     .app-carousel-slide.is-active .app-carousel-caption-title {
       color: var(--gold);
     }
     .app-carousel-slide.is-active .app-carousel-caption-sub {
-      color: var(--white);
-      opacity: 0.75;
+      color: rgba(238, 238, 232, 0.88);
+      opacity: 1;
     }
     .app-carousel-btn {
       flex-shrink: 0;
@@ -1017,7 +1016,7 @@
       outline: none;
       transition: border-color .2s;
     }
-    .email-input::placeholder { color: var(--muted); }
+    .email-input::placeholder { color: rgba(238, 238, 232, 0.5); }
     .email-input:focus { border-color: var(--gold); }
     .email-submit {
       background: var(--gold);
