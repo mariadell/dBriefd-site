@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dBriefd — One daily briefing. Your world, digested.</title>
+  <title>dBriefd: One daily briefing. Your world, digested.</title>
   <meta name="description" content="Replace endless scrolling with one calm, personalized daily news brief. Choose topics. Get short summaries. Read or listen as podcast. Free tier available." />
-  <meta property="og:title" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta property="og:title" content="dBriefd: One daily briefing. Your world, digested." />
   <meta property="og:description" content="One curated briefing per day. Podcast-style audio briefings. Stay informed without the overwhelm." />
   <meta property="og:url" content="https://dbriefd.app/" />
   <link rel="canonical" href="https://dbriefd.app/" />
@@ -15,12 +15,12 @@
   <meta property="og:image" content="https://dbriefd.app/og-image.png" />
   <meta property="og:image:width" content="1376" />
   <meta property="og:image:height" content="768" />
-  <meta property="og:image:alt" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta property="og:image:alt" content="dBriefd: One daily briefing. Your world, digested." />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta name="twitter:title" content="dBriefd: One daily briefing. Your world, digested." />
   <meta name="twitter:description" content="Replace endless scrolling with one calm, personalized daily brief. Podcast-style audio. Read or listen in minutes." />
   <meta name="twitter:image" content="https://dbriefd.app/og-image.png" />
-  <meta name="twitter:image:alt" content="dBriefd — One daily briefing. Your world, digested." />
+  <meta name="twitter:image:alt" content="dBriefd: One daily briefing. Your world, digested." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -72,6 +72,17 @@
     .muted   { color: var(--muted); }
     .mono    { font-family: var(--font-mono); }
     .center  { text-align: center; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     /* ── NAV ────────────────────────────────────────────────────── */
     nav {
@@ -95,6 +106,7 @@
     .nav-cta {
       display: flex; align-items: center; gap: .75rem;
     }
+    .nav-pricing-hidden { display: none; }
     .pill {
       font-family: var(--font-mono);
       font-size: .72rem;
@@ -215,9 +227,15 @@
     /* stores badge row */
     .stores {
       margin-top: 1.5rem;
-      display: flex; align-items: center; gap: 1rem;
+      display: flex; align-items: flex-start; gap: 1rem;
       opacity: 0;
       animation: fadeUp .7s var(--ease) .65s forwards;
+    }
+    .store-badge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .35rem;
     }
     .store-badge {
       display: flex; align-items: center; gap: .5rem;
@@ -232,6 +250,25 @@
     }
     .store-badge:hover { color: var(--white); border-color: rgba(238,238,232,.2); }
     .store-badge svg { width: 16px; height: 16px; }
+    .store-badge--disabled {
+      opacity: .45;
+      color: var(--muted);
+      border-color: rgba(238,238,232,.12);
+      cursor: default;
+      pointer-events: none;
+    }
+    .store-badge--disabled:hover {
+      color: var(--muted);
+      border-color: rgba(238,238,232,.12);
+    }
+    .store-soon-label {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: .75;
+    }
 
     /* scroll hint */
     .scroll-hint {
@@ -275,6 +312,222 @@
       letter-spacing: .1em;
       text-transform: uppercase;
       margin-top: .25rem;
+    }
+
+    /* ── APP SCREENSHOTS (carousel) ─────────────────────────────── */
+    .app-screens-section .section-title { max-width: 720px; }
+    .app-carousel {
+      margin-top: 3rem;
+      padding: .75rem 0 1rem;
+    }
+    .app-carousel-viewport {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .app-carousel-stack-wrap {
+      justify-self: stretch;
+      width: 100%;
+      max-width: min(960px, 100%);
+      margin-inline: auto;
+    }
+    .app-carousel-window {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: visible;
+    }
+    .app-carousel-track {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      width: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding: 1rem max(1rem, calc((100% - min(260px, 38vw)) / 2)) 2.5rem;
+      min-width: 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .app-carousel-track::-webkit-scrollbar {
+      display: none;
+    }
+    .app-carousel-track:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--gold);
+      border-radius: 8px;
+    }
+    .app-carousel-slide {
+      flex: 0 0 min(260px, 38vw);
+      min-width: 0;
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .65rem;
+      transform: scale(0.88);
+      opacity: 0.55;
+      filter: saturate(0.92);
+      transition: transform 0.45s var(--ease), opacity 0.45s var(--ease), filter 0.45s var(--ease);
+      z-index: 1;
+    }
+    .app-carousel-slide.is-active {
+      transform: scale(1);
+      opacity: 1;
+      filter: none;
+      z-index: 3;
+    }
+    .app-screen-frame {
+      width: 100%;
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      box-shadow: 0 10px 28px rgba(0,0,0,.4);
+      overflow: hidden;
+      padding: .45rem;
+      transition: border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+    }
+    .app-carousel-slide.is-active .app-screen-frame {
+      border-color: rgba(230,179,50,.32);
+      box-shadow:
+        0 0 0 1px rgba(230,179,50,.14),
+        0 28px 56px -10px rgba(0,0,0,.78),
+        0 1px 0 rgba(255,255,255,.05) inset;
+    }
+    .app-screen-frame img {
+      width: 100%;
+      height: auto;
+      border-radius: calc(28px - .45rem);
+      vertical-align: middle;
+    }
+    .app-carousel-caption {
+      width: 100%;
+      max-width: 14rem;
+      text-align: center;
+      transition: color 0.35s var(--ease), opacity 0.35s var(--ease);
+    }
+    .app-carousel-caption-title {
+      display: block;
+      font-family: var(--font-display);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: -.02em;
+      margin-bottom: .2rem;
+    }
+    .app-carousel-caption-sub {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.45;
+      opacity: 0.85;
+    }
+    .app-carousel-slide.is-active .app-carousel-caption-title {
+      color: var(--gold);
+    }
+    .app-carousel-slide.is-active .app-carousel-caption-sub {
+      color: var(--white);
+      opacity: 0.75;
+    }
+    .app-carousel-btn {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: border-color .2s var(--ease), color .2s var(--ease), background .2s var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app-carousel-btn:hover {
+      border-color: var(--gold);
+      color: var(--white);
+      background: rgba(230,179,50,.08);
+    }
+    .app-carousel-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .25rem;
+      flex-wrap: wrap;
+    }
+    .app-carousel-dot {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .app-carousel-dot::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: background .2s, border-color .2s;
+    }
+    .app-carousel-dot:hover::after,
+    .app-carousel-dot:focus-visible::after {
+      border-color: var(--gold);
+    }
+    .app-carousel-dot:focus-visible {
+      outline: none;
+    }
+    .app-carousel-dot:focus-visible::after {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--gold);
+    }
+    .app-carousel-dot[aria-current="true"]::after {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .app-carousel-track { scroll-behavior: auto; }
+      .app-carousel-slide,
+      .app-screen-frame,
+      .app-carousel-caption {
+        transition: none;
+      }
+    }
+    @media (max-width: 640px) {
+      .app-carousel-viewport {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+      }
+      .app-carousel-stack-wrap {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        justify-self: center;
+      }
+      .app-carousel-prev {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: end;
+        margin-right: .35rem;
+      }
+      .app-carousel-next {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: start;
+        margin-left: .35rem;
+      }
     }
 
     /* ── SECTIONS SHARED ────────────────────────────────────────── */
@@ -545,6 +798,16 @@
 
     /* ── PRICING ────────────────────────────────────────────────── */
     #pricing { background: var(--bg); }
+    .pricing-teaser-line {
+      background: var(--bg);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      margin: 0;
+      padding: 4rem 1.5rem;
+    }
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -694,7 +957,51 @@
       margin-bottom: 2.5rem;
     }
     .cta-form { width: 100%; max-width: 100%; }
-    .cta-form .email-row { margin-bottom: 0; }
+    .cta-form .email-row--top {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .cta-form .submit-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 0;
+    }
+    .platform-field {
+      margin: 0 auto 1.25rem;
+      max-width: 320px;
+      text-align: left;
+    }
+    .platform-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: .7rem;
+      letter-spacing: .04em;
+      line-height: 1.4;
+    }
+    .platform-options {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .5rem;
+    }
+    .platform-options label {
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      color: var(--white);
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      cursor: pointer;
+    }
+    .platform-options input[type="radio"] {
+      accent-color: var(--gold);
+      width: .95rem;
+      height: .95rem;
+    }
     .email-row {
       display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center;
     }
@@ -802,6 +1109,8 @@
       .btn-primary, .btn-secondary { justify-content: center; }
       .email-row { flex-direction: column; }
       .email-input { max-width: 100%; }
+      .platform-field { max-width: 100%; }
+      .email-submit { width: 100%; max-width: 320px; }
     }
   </style>
   <script type="application/ld+json">
@@ -843,7 +1152,7 @@
       <span class="d">d</span><span class="br">Brief</span><span class="d2">d</span>
     </div>
     <div class="nav-cta">
-      <a href="#pricing" class="pill pill-outline">Pricing</a>
+      <a href="#pricing" class="pill pill-outline nav-pricing-hidden">Pricing</a>
       <a href="#cta" class="pill pill-gold">Get Early Access</a>
     </div>
   </nav>
@@ -856,7 +1165,7 @@
       Replace endless scrolling with<br />one <em>calm</em> daily brief.
     </h1>
     <p class="hero-sub">
-      All the news you need — in one daily brief. No noise. No scrolling. Choose your topics. Short, clear summaries. Read in minutes — or listen like a podcast.
+      All the news you need, in one daily brief. No noise. No scrolling. Choose your topics. Short, clear summaries. Read in minutes, or listen like a podcast.
     </p>
     <div class="hero-actions">
       <a href="#cta" class="btn-primary">
@@ -868,10 +1177,13 @@
       </a>
     </div>
     <div class="stores">
-      <a href="#cta" class="store-badge">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-        App Store
-      </a>
+      <div class="store-badge-wrap">
+        <span class="store-badge store-badge--disabled" aria-disabled="true" tabindex="-1">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          App Store
+        </span>
+        <span class="store-soon-label">Coming soon</span>
+      </div>
       <a href="#cta" class="store-badge">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.16.65.17.97 0l11.5-6.56-2.84-2.87-9.63 9.43zm14.52-9.08L5.26.5C4.95.31 4.58.3 4.25.46L14.02 11.7l3.68-1.02zM21.54 10.2l-2.8-1.6-3.27.91 3.27 3.3 2.8-1.62c.8-.45.8-1.54 0-1.99zM4.25 23.54c.33.16.7.15 1.01-.04L17.8 16.8 14.02 12.3 4.25 23.54z"/></svg>
         Google Play
@@ -903,17 +1215,116 @@
     </div>
   </div>
 
+  <!-- APP SCREENSHOTS -->
+  <section id="app-screens" class="app-screens-section" aria-labelledby="app-screens-heading">
+    <div class="section-inner">
+      <p class="section-tag reveal">Inside the app</p>
+      <h2 id="app-screens-heading" class="section-title reveal">Calm news, built for real life.</h2>
+      <p class="section-body reveal">Your topics, trusted sources, daily briefing, and settings: the flow you actually use.</p>
+
+      <div class="app-carousel reveal">
+        <p id="app-carousel-live" class="sr-only" aria-live="polite">Slide 2 of 4: News feed</p>
+        <div class="app-carousel-viewport">
+          <button type="button" class="app-carousel-btn app-carousel-prev" aria-controls="app-carousel-track" aria-label="Show previous screenshot">‹</button>
+          <div class="app-carousel-stack-wrap">
+            <div class="app-carousel-window">
+          <div
+            id="app-carousel-track"
+            class="app-carousel-track"
+            tabindex="0"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="dBriefd app screenshots"
+          >
+            <div class="app-carousel-slide">
+              <figure class="app-screen-frame">
+                <img
+                  src="images/screenshots/topics.png"
+                  alt="dBriefd Topics screen: grid of interests such as AI and SaaS with yellow selection outlines and Save."
+                  width="524"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              <div class="app-carousel-caption">
+                <span class="app-carousel-caption-title">Topics</span>
+                <span class="app-carousel-caption-sub">Choose what matters; we build the brief around you.</span>
+              </div>
+            </div>
+            <div class="app-carousel-slide is-active">
+              <figure class="app-screen-frame">
+                <img
+                  src="images/screenshots/briefing.png"
+                  alt="dBriefd briefing screen: dated daily brief with story cards, read progress, Play all, and per-article play buttons."
+                  width="517"
+                  height="1024"
+                  decoding="async"
+                />
+              </figure>
+              <div class="app-carousel-caption">
+                <span class="app-carousel-caption-title">News feed</span>
+                <span class="app-carousel-caption-sub">Your daily brief—read or listen in one place.</span>
+              </div>
+            </div>
+            <div class="app-carousel-slide">
+              <figure class="app-screen-frame">
+                <img
+                  src="images/screenshots/add-source.png"
+                  alt="dBriefd Add Source screen: Discover tab, category pills, and curated feeds with add actions."
+                  width="515"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              <div class="app-carousel-caption">
+                <span class="app-carousel-caption-title">Sources</span>
+                <span class="app-carousel-caption-sub">Add trusted feeds, blogs, and newsletters you follow.</span>
+              </div>
+            </div>
+            <div class="app-carousel-slide">
+              <figure class="app-screen-frame">
+                <img
+                  src="images/screenshots/settings.png"
+                  alt="dBriefd Settings: Pro plan badge, briefing time, topics, trusted sources, stories per day, summaries, audio, and custom sources."
+                  width="519"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              <div class="app-carousel-caption">
+                <span class="app-carousel-caption-title">Settings</span>
+                <span class="app-carousel-caption-sub">Time, audio, limits, and your Pro plan—one calm screen.</span>
+              </div>
+            </div>
+          </div>
+            </div>
+          </div>
+          <button type="button" class="app-carousel-btn app-carousel-next" aria-controls="app-carousel-track" aria-label="Show next screenshot">›</button>
+        </div>
+        <div class="app-carousel-dots" role="group" aria-label="Choose screenshot">
+          <button type="button" class="app-carousel-dot" data-slide="0" aria-label="Go to slide 1, Topics"></button>
+          <button type="button" class="app-carousel-dot" aria-current="true" data-slide="1" aria-label="Go to slide 2, News feed"></button>
+          <button type="button" class="app-carousel-dot" data-slide="2" aria-label="Go to slide 3, Sources"></button>
+          <button type="button" class="app-carousel-dot" data-slide="3" aria-label="Go to slide 4, Settings"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- HOW IT WORKS -->
   <section id="how">
     <div class="section-inner">
-      <p class="section-tag reveal">What is Briefd</p>
+      <p class="section-tag reveal">What is dBriefd</p>
       <h2 class="section-title reveal">One daily briefing.<br/>Tailored to you.</h2>
-      <p class="section-body reveal">News today is noisy, endless, and overwhelming. You jump between apps, scroll too much, and still miss what matters. Briefd replaces all of that with one daily briefing — short, clear summaries, only the topics you care about, delivered once per day. Stay informed without stress.</p>
+      <p class="section-body reveal">News today is noisy, endless, and overwhelming. You jump between apps, scroll too much, and still miss what matters. dBriefd replaces all of that with one daily briefing: short, clear summaries, only the topics you care about, delivered once per day. Stay informed without stress.</p>
       <div class="steps">
         <div class="step reveal">
           <div class="step-num">01 / CONFIGURE</div>
           <div class="step-title">Pick your world</div>
-          <p class="step-desc">Choose your topics and delivery time. Gaming, finance, books, health — mix however you want. Your brief is yours alone.</p>
+          <p class="step-desc">Choose your topics and delivery time. Gaming, finance, books, health. Mix however you want. Your brief is yours alone.</p>
         </div>
         <div class="step reveal">
           <div class="step-num">02 / RECEIVE</div>
@@ -923,12 +1334,12 @@
         <div class="step reveal">
           <div class="step-num">03 / CONSUME</div>
           <div class="step-title">Read or listen</div>
-          <p class="step-desc">Turn your briefing into a podcast-style audio digest. Commute, gym, coffee — consume your world on your terms, eyes free.</p>
+          <p class="step-desc">Turn your briefing into a podcast-style audio digest. Commute, gym, coffee. Consume your world on your terms, eyes free.</p>
         </div>
         <div class="step reveal">
           <div class="step-num">04 / DIG IN</div>
           <div class="step-title">Go deeper when you want</div>
-          <p class="step-desc">Every summary links back to the full article. Curious? One tap opens it in-app — no rabbit holes, no tab explosions.</p>
+          <p class="step-desc">Every summary links back to the full article. Curious? One tap opens it in-app. No rabbit holes, no tab explosions.</p>
         </div>
       </div>
     </div>
@@ -940,7 +1351,7 @@
       <p class="section-tag">Who it's for</p>
       <div class="verticals-intro">
         <h2 class="section-title reveal">Built for people who<br/>want clarity.</h2>
-        <p class="section-body reveal">Or anyone who wants to stay informed — without overload.</p>
+        <p class="section-body reveal">Or anyone who wants to stay informed without overload.</p>
       </div>
 
       <div class="niche-tabs reveal">
@@ -963,7 +1374,7 @@
           <div class="niche-content">
             <p class="niche-tag">For developers</p>
             <h3 class="niche-headline">Stop doomscrolling<br/>at 11pm.</h3>
-            <p class="niche-body">You built for focus. Your news habit shouldn't undo that. Get your daily dev brief — framework releases, industry moves, AI research, job market — and close the app.</p>
+            <p class="niche-body">You built for focus. Your news habit shouldn't undo that. Get your daily dev brief: framework releases, industry moves, AI research, job market. Then close the app.</p>
             <div class="niche-pills">
               <span class="niche-pill">AI & machine learning</span>
               <span class="niche-pill">Cloud & security</span>
@@ -975,7 +1386,7 @@
               <span class="brief-card-label">Dev Brief · Today 7:00am</span>
               <span class="brief-card-time">3 min read</span>
             </div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major framework hits LTS — key changes you should know about. <span>Update recommended.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major framework hits LTS: key changes you should know about. <span>Update recommended.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">AI model pricing drops 40% across providers. <span>Affects billing from today.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Critical zero-day in popular dev tool patched. <span>Update if you're on older versions.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Cloud provider drops edge function cold-start times to <span>&lt;50ms</span> globally. Benchmarks inside.</div></div>
@@ -987,7 +1398,7 @@
           <div class="niche-content">
             <p class="niche-tag">For investors</p>
             <h3 class="niche-headline">Market signal,<br/>not market noise.</h3>
-            <p class="niche-body">Markets are noisy. Get a clean morning brief — what moved, what's worth watching, what you can actually act on.</p>
+            <p class="niche-body">Markets are noisy. Get a clean morning brief: what moved, what's worth watching, what you can actually act on.</p>
             <div class="niche-pills">
               <span class="niche-pill">Markets</span>
               <span class="niche-pill">Startups & fintech</span>
@@ -998,7 +1409,7 @@
               <span class="brief-card-label">Finance Brief · Today 6:00am</span>
               <span class="brief-card-time">5 min read</span>
             </div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Central bank holds rates steady. Chair signals <span>2 cuts projected for H2</span> — markets up 0.4% on open.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Central bank holds rates steady. Chair signals <span>2 cuts projected for H2</span>; markets up 0.4% on open.</div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Tech giant beats Q1 earnings by 18%. <span>Data center revenue +209% YoY.</span> Stock +6% pre-market.</div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major AI company files for secondary raise. <span>Term sheets being circulated this week.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Top VC publishes annual AI report. <span>Key finding: enterprise retention rates dropping</span> in year-2 cohorts.</div></div>
@@ -1010,7 +1421,7 @@
           <div class="niche-content">
             <p class="niche-tag">For travelers</p>
             <h3 class="niche-headline">Destinations, trends, tips.</h3>
-            <p class="niche-body">Stay on top of travel news — new routes, visa updates, destination highlights, and practical tips for your next trip.</p>
+            <p class="niche-body">Stay on top of travel news: new routes, visa updates, destination highlights, and practical tips for your next trip.</p>
             <div class="niche-pills">
               <span class="niche-pill">Destinations</span>
               <span class="niche-pill">Travel trends</span>
@@ -1034,7 +1445,7 @@
           <div class="niche-content">
             <p class="niche-tag">For sports fans</p>
             <h3 class="niche-headline">Scores, transfers, headlines.</h3>
-            <p class="niche-body">Your daily sports digest — results, trades, major stories. No fluff. Just what happened and what matters.</p>
+            <p class="niche-body">Your daily sports digest: results, trades, major stories. No fluff. Just what happened and what matters.</p>
             <div class="niche-pills">
               <span class="niche-pill">Scores</span>
               <span class="niche-pill">Transfers</span>
@@ -1058,7 +1469,7 @@
           <div class="niche-content">
             <p class="niche-tag">For book lovers</p>
             <h3 class="niche-headline">New releases, reviews.</h3>
-            <p class="niche-body">New releases, award news, author interviews, publishing buzz — without the noise. A 5-minute read about what's worth reading.</p>
+            <p class="niche-body">New releases, award news, author interviews, publishing buzz, all without the noise. A 5-minute read about what's worth reading.</p>
             <div class="niche-pills">
               <span class="niche-pill">New releases</span>
               <span class="niche-pill">Reviews</span>
@@ -1073,7 +1484,7 @@
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major literary prize longlist announced. <span>11 titles, 3 debut novels.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Acclaimed author's new essay collection drops this month. <span>Pre-orders open now.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Publishing industry reports rise in literary fiction sales. <span>Physical books outpace ebooks.</span></div></div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">This week's rec: <span>a buzzy debut novel</span> — strong ratings, growing word of mouth.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">This week's rec: <span>a buzzy debut novel</span>. Strong ratings, growing word of mouth.</div></div>
           </div>
         </div>
 
@@ -1082,7 +1493,7 @@
           <div class="niche-content">
             <p class="niche-tag">For gamers</p>
             <h3 class="niche-headline">Releases, industry news.</h3>
-            <p class="niche-body">Patch notes, studio announcements, esports results, hardware drops — before you load into your first match. No clickbait. Just the brief.</p>
+            <p class="niche-body">Patch notes, studio announcements, esports results, and hardware drops, all before you load into your first match. No clickbait. Just the brief.</p>
             <div class="niche-pills">
               <span class="niche-pill">Releases</span>
               <span class="niche-pill">Industry news</span>
@@ -1094,7 +1505,7 @@
               <span class="brief-card-label">Gaming Brief · Today 8:00am</span>
               <span class="brief-card-time">4 min read</span>
             </div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Patch live — ranked matchmaking rebalanced. <span>3 heroes adjusted.</span></div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Patch live: ranked matchmaking rebalanced. <span>3 heroes adjusted.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Major esports finals set for this weekend. <span>Grand Final Sunday.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New GPU benchmarks leaked. <span>15% faster at lower price.</span></div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Subscription service adds 4 titles. <span>Major DLC included.</span></div></div>
@@ -1106,7 +1517,7 @@
           <div class="niche-content">
             <p class="niche-tag">For wellness & mental health</p>
             <h3 class="niche-headline">Psychology, habits, wellbeing.</h3>
-            <p class="niche-body">Mental health, psychology, and wellbeing — filtered for real research. No hype. Stay informed on what actually helps.</p>
+            <p class="niche-body">Mental health, psychology, and wellbeing, filtered for real research. No hype. Stay informed on what actually helps.</p>
             <div class="niche-pills">
               <span class="niche-pill">Psychology</span>
               <span class="niche-pill">Habits</span>
@@ -1119,8 +1530,8 @@
               <span class="brief-card-time">3 min read</span>
             </div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">New study: <span>Zone 2 cardio 3×/week</span> reduces all-cause mortality by 26% vs sedentary baseline.</div></div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Creatine monohydrate confirmed effective for <span>cognitive performance</span> under sleep deprivation — meta-analysis of 14 trials.</div></div>
-            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">FDA clears new CGM (continuous glucose monitor) for <span>non-diabetic consumers</span> — no prescription needed.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Creatine monohydrate confirmed effective for <span>cognitive performance</span> under sleep deprivation. Meta-analysis of 14 trials.</div></div>
+            <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">FDA clears new CGM (continuous glucose monitor) for <span>non-diabetic consumers</span>; no prescription needed.</div></div>
             <div class="brief-item"><div class="brief-dot"></div><div class="brief-text">Stretching timing study: <span>post-workout is 2× more effective</span> than pre-workout for long-term flexibility gains.</div></div>
           </div>
         </div>
@@ -1130,7 +1541,7 @@
           <div class="niche-content">
             <p class="niche-tag">For climate & sustainability</p>
             <h3 class="niche-headline">Energy, policy, renewables.</h3>
-            <p class="niche-body">Climate news, energy transitions, renewables, and policy — without the noise. Stay informed on what's shaping our future.</p>
+            <p class="niche-body">Climate news, energy transitions, renewables, and policy, all without the noise. Stay informed on what's shaping our future.</p>
             <div class="niche-pills">
               <span class="niche-pill">Climate</span>
               <span class="niche-pill">Renewables</span>
@@ -1154,7 +1565,7 @@
           <div class="niche-content">
             <p class="niche-tag">For entrepreneurs</p>
             <h3 class="niche-headline">Startups, product, growth.</h3>
-            <p class="niche-body">Startup funding, ecosystem news, product insights, and growth strategies — your daily briefing for building.</p>
+            <p class="niche-body">Startup funding, ecosystem news, product insights, and growth strategies: your daily briefing for building.</p>
             <div class="niche-pills">
               <span class="niche-pill">Startup funding</span>
               <span class="niche-pill">Product & design</span>
@@ -1178,7 +1589,7 @@
           <div class="niche-content">
             <p class="niche-tag">For remote workers</p>
             <h3 class="niche-headline">Productivity, distributed teams.</h3>
-            <p class="niche-body">Remote work, productivity, and distributed teams — stay informed on what's shaping how we work.</p>
+            <p class="niche-body">Remote work, productivity, and distributed teams. Stay informed on what's shaping how we work.</p>
             <div class="niche-pills">
               <span class="niche-pill">Productivity</span>
               <span class="niche-pill">Distributed teams</span>
@@ -1208,9 +1619,14 @@
       <h2 class="section-title reveal">Designed against<br/>the attention economy.</h2>
       <div class="features-grid">
         <div class="feat reveal">
+          <div class="feat-icon">📰</div>
+          <div class="feat-title">Your own sources</div>
+          <p class="feat-desc">Follow the blogs and newsletters you already read. Your brief, your sources.</p>
+        </div>
+        <div class="feat reveal">
           <div class="feat-icon">🎙️</div>
-          <div class="feat-title">Podcast-style audio briefings</div>
-          <p class="feat-desc">Every briefing becomes a natural-sounding audio digest (10–30 min). Commute, gym, or morning coffee — your brief plays like a show, not a robot reading headlines.</p>
+          <div class="feat-title">Listen like a podcast</div>
+          <p class="feat-desc">Every briefing becomes a natural audio digest. Commute, gym, coffee, eyes free.</p>
         </div>
         <div class="feat reveal">
           <div class="feat-icon">🔇</div>
@@ -1220,22 +1636,17 @@
         <div class="feat reveal">
           <div class="feat-icon">🚫</div>
           <div class="feat-title">No ads. Ever.</div>
-          <p class="feat-desc">We don't sell your attention. We don't sell your data. The business model is simple: you pay a small monthly fee — no ads, no data selling. Aligned incentives.</p>
+          <p class="feat-desc">We don't sell your attention. We don't sell your data. The business model is simple: you pay a small monthly fee. No ads, no data selling. Aligned incentives.</p>
         </div>
         <div class="feat reveal">
           <div class="feat-icon">⚡</div>
           <div class="feat-title">Clear, factual summaries</div>
-          <p class="feat-desc">Short snippets that give you the context to understand why something matters — then stop. Not a link aggregator. Not a headline digest.</p>
+          <p class="feat-desc">Short snippets that give you the context to understand why something matters. Then stop. Not a link aggregator. Not a headline digest.</p>
         </div>
         <div class="feat reveal">
           <div class="feat-icon">🎯</div>
           <div class="feat-title">Hyper-personalized</div>
-          <p class="feat-desc">Your topics, your sources, your cadence. Morning, evening, or midday. 3 topics or 10. Your brief, configured once, delivered perfectly every time.</p>
-        </div>
-        <div class="feat reveal">
-          <div class="feat-icon">🔗</div>
-          <div class="feat-title">One tap to the source</div>
-          <p class="feat-desc">Every summary links to the original article, opened in a clean in-app reader. No browser switching. No tracking parameters. Just the story.</p>
+          <p class="feat-desc">Your topics, your cadence. Morning, evening, or midday. 3 topics or 10. Your brief, configured once, delivered perfectly every time.</p>
         </div>
       </div>
     </div>
@@ -1245,7 +1656,7 @@
   <section id="boost">
     <div class="section-inner">
       <p class="section-tag reveal">Save time. Stay focused.</p>
-      <h2 class="section-title reveal">With Briefd you can:</h2>
+      <h2 class="section-title reveal">With dBriefd you can:</h2>
       <div class="boost-grid reveal">
         <div class="boost-item">
           <span class="boost-icon">⏱</span>
@@ -1263,18 +1674,21 @@
     </div>
   </section>
 
-  <!-- PRICING -->
+  <p class="pricing-teaser-line">Free to try. Paid plans at launch.</p>
+
+  <!-- PRICING HIDDEN - enable when payments go live -->
+  <div style="display: none;">
   <section id="pricing">
     <div class="section-inner">
       <p class="section-tag reveal">Plans at a glance</p>
       <h2 class="section-title reveal">What's coming.<br/>Pricing announced at launch.</h2>
-      <p class="section-body reveal">We're in early access. Join the beta to try it — no commitment. Final pricing when we launch.</p>
+      <p class="section-body reveal">We're in early access. Join the beta to try it with no commitment. Final pricing when we launch.</p>
       <div class="pricing-grid">
 
         <div class="plan reveal">
           <div class="plan-name">Free</div>
           <div class="plan-price">$0 <span class="mo">/ forever</span></div>
-          <p class="plan-desc">Your daily taste of calm news. Perfect for trying Briefd.</p>
+          <p class="plan-desc">Your daily taste of calm news. Perfect for trying dBriefd.</p>
           <ul class="plan-features">
             <li>5 stories per day</li>
             <li>Choose up to 2 topics</li>
@@ -1290,7 +1704,7 @@
         <div class="plan reveal">
           <div class="plan-name">Pro · Monthly</div>
           <div class="plan-price"><span class="price-amount">Coming soon</span></div>
-          <p class="plan-desc">Your complete daily brief. Everything you need to stay informed — without noise.</p>
+          <p class="plan-desc">Your complete daily brief. Everything you need to stay informed without noise.</p>
           <ul class="plan-features">
             <li>Up to 30 stories per day</li>
             <li>Unlimited topics</li>
@@ -1325,16 +1739,27 @@
       </div>
     </div>
   </section>
+  </div>
 
   <!-- CTA -->
   <section id="cta">
     <div class="cta-inner">
       <p class="cta-eyebrow">Early Access Open</p>
       <h2 class="cta-headline">Your morning deserves better.</h2>
-      <p class="cta-sub">One briefing. Your topics. Delivered daily. Join the early access list — no spam, just a single email when doors open.</p>
+      <p class="cta-sub">One briefing. Your topics. Delivered daily. Join the early access list. No spam, just a single email when doors open.</p>
       <form id="early-access-form" class="cta-form" action="https://formspree.io/f/mjgapeln" method="POST">
-        <div class="email-row">
-          <input class="email-input" type="email" name="email" placeholder="your@email.com" required />
+        <div class="email-row email-row--top">
+          <input class="email-input" type="email" name="email" placeholder="your@email.com" required autocomplete="email" />
+        </div>
+        <div class="platform-field">
+          <span class="platform-label" id="platform-label">Which platform are you waiting for?</span>
+          <div class="platform-options" role="radiogroup" aria-labelledby="platform-label">
+            <label><input type="radio" name="platform" value="Android" required /> Android</label>
+            <label><input type="radio" name="platform" value="iOS" /> iOS</label>
+            <label><input type="radio" name="platform" value="Both" /> Both</label>
+          </div>
+        </div>
+        <div class="submit-row">
           <button type="submit" class="email-submit">Claim your spot →</button>
         </div>
       </form>
@@ -1413,17 +1838,147 @@
     }, { threshold: 0.08 });
     revealEls.forEach(el => observer.observe(el));
 
+    /* App screenshots carousel */
+    (function() {
+      var root = document.getElementById('app-screens');
+      if (!root) return;
+      var track = document.getElementById('app-carousel-track');
+      var slides = root.querySelectorAll('.app-carousel-slide');
+      var prevBtn = root.querySelector('.app-carousel-prev');
+      var nextBtn = root.querySelector('.app-carousel-next');
+      var dots = root.querySelectorAll('.app-carousel-dot');
+      var live = document.getElementById('app-carousel-live');
+      var reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var titles = ['Topics', 'News feed', 'Sources', 'Settings'];
+      var n = slides.length;
+      var ticking = false;
+
+      function reducedMotion() {
+        return reducedMq.matches;
+      }
+
+      function gapPx() {
+        var v = parseFloat(getComputedStyle(track).gap);
+        return isNaN(v) ? 0 : v;
+      }
+
+      function padLeftPx() {
+        var v = parseFloat(getComputedStyle(track).paddingLeft);
+        return isNaN(v) ? 0 : v;
+      }
+
+      function scrollToIndex(i, instant) {
+        i = ((i % n) + n) % n;
+        var gap = gapPx();
+        var pl = padLeftPx();
+        var leftEdge = pl;
+        for (var j = 0; j < i; j++) {
+          leftEdge += slides[j].offsetWidth + gap;
+        }
+        var slide = slides[i];
+        var target = leftEdge + slide.offsetWidth / 2 - track.clientWidth / 2;
+        var behavior = (instant || reducedMotion()) ? 'auto' : 'smooth';
+        track.scrollTo({ left: Math.max(0, target), behavior: behavior });
+      }
+
+      function getActiveIndex() {
+        var scrollMid = track.scrollLeft + track.clientWidth * 0.5;
+        var acc = padLeftPx();
+        var gap = gapPx();
+        var best = 0;
+        var bestDist = Infinity;
+        for (var i = 0; i < n; i++) {
+          var w = slides[i].offsetWidth;
+          var mid = acc + w * 0.5;
+          var dist = Math.abs(mid - scrollMid);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = i;
+          }
+          acc += w + gap;
+        }
+        return best;
+      }
+
+      function syncUI(i) {
+        if (live) {
+          live.textContent = 'Slide ' + (i + 1) + ' of ' + n + ': ' + titles[i];
+        }
+        dots.forEach(function(dot, j) {
+          if (j === i) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
+        });
+        slides.forEach(function(slide, j) {
+          if (j === i) slide.classList.add('is-active');
+          else slide.classList.remove('is-active');
+        });
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            syncUI(getActiveIndex());
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      track.addEventListener('scroll', onScroll, { passive: true });
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+          var idx = getActiveIndex();
+          syncUI(idx);
+          scrollToIndex(idx, true);
+        }, 80);
+      });
+
+      prevBtn.addEventListener('click', function() {
+        scrollToIndex(getActiveIndex() - 1, false);
+      });
+      nextBtn.addEventListener('click', function() {
+        scrollToIndex(getActiveIndex() + 1, false);
+      });
+
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          var i = parseInt(dot.getAttribute('data-slide'), 10);
+          if (!isNaN(i)) scrollToIndex(i, false);
+        });
+      });
+
+      track.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          scrollToIndex(getActiveIndex() - 1, false);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          scrollToIndex(getActiveIndex() + 1, false);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          scrollToIndex(0, false);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          scrollToIndex(n - 1, false);
+        }
+      });
+
+      syncUI(1);
+      requestAnimationFrame(function() {
+        scrollToIndex(1, true);
+        syncUI(getActiveIndex());
+      });
+    })();
+
     /* Formspree form submission */
     document.getElementById('early-access-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const form = this;
       const input = form.querySelector('.email-input');
       const btn = form.querySelector('.email-submit');
-      if (!input.value || !input.value.includes('@')) {
-        input.style.borderColor = 'var(--gold)';
-        input.focus();
-        return;
-      }
+      if (!form.reportValidity()) return;
       btn.disabled = true;
       btn.textContent = 'Sending...';
       try {
@@ -1438,6 +1993,11 @@
           btn.style.color = '#fff';
           input.disabled = true;
           input.style.opacity = '.4';
+          var platformField = form.querySelector('.platform-field');
+          if (platformField) platformField.style.opacity = '.4';
+          form.querySelectorAll('input[name="platform"]').forEach(function(r) {
+            r.disabled = true;
+          });
         } else {
           btn.textContent = 'Claim your spot →';
           btn.disabled = false;

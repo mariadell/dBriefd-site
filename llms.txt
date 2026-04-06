@@ -3,7 +3,7 @@
 > dBriefd is a personalized daily news briefing app. Replace endless scrolling with one calm, curated daily brief. Choose your topics (gaming, finance, tech, books, etc.), get short summaries. Read in minutes or listen as podcast-style audio. No ads. No infinite scroll. iOS and Android.
 
 ## Name
-dBriefd (also spelled Briefd in app)
+The official product name is dBriefd.
 
 ## Summary
 dBriefd delivers one daily brief per day with news summaries tailored to your topics. No noise, no scrolling. Free tier available. Pro plans at launch.
